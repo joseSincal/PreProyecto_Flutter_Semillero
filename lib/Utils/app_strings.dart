@@ -1,0 +1,4 @@
+enum Strings {
+  navHome,
+  logOut
+}
