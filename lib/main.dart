@@ -6,9 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pre_proyecto_universales_chat/Localization/localization.dart';
-import 'package:pre_proyecto_universales_chat/Pages/page_login/page_login.dart';
 import 'package:pre_proyecto_universales_chat/Providers/languaje_provider.dart';
 import 'package:pre_proyecto_universales_chat/Providers/theme_provider.dart';
+import 'package:pre_proyecto_universales_chat/Repository/auth_repository.dart';
+import 'package:pre_proyecto_universales_chat/Widgets/app.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -90,7 +91,7 @@ class _MyAppState extends State<MyApp> {
                   themeMode: themeProvider.getTheme,
                   debugShowCheckedModeBanner: false,
                   title: 'SemiFlutter',
-                  home: const PageLogin(),
+                  home: App(authRepository: AuthRepository()),
                 );
               }),
             );
