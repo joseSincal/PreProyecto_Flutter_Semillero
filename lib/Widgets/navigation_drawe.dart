@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Localization/localization.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_dashboard/page_dashboard.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_profile/page_profile.dart';
@@ -87,7 +88,7 @@ class NavigationDrawer extends StatelessWidget {
               icon: Icons.logout_rounded,
               title: localizations.dictionary(Strings.logOut),
               onTap: () {
-                Navigator.pop(context);
+                context.read<AuthBloc>().add(SignOutRequested());
               }),
         ],
       ),

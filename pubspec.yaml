@@ -21,6 +21,7 @@ dependencies:
   firebase_database: ^9.0.14
   firebase_auth: ^3.3.18
   google_sign_in: ^5.3.1
+  flutter_facebook_auth: ^4.3.4
   cloud_firestore: ^3.1.15
 
   shared_preferences: ^2.0.15
