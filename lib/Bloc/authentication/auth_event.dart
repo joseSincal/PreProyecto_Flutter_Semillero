@@ -21,6 +21,8 @@ class SignUpRequested extends AuthEvent {
 
 class GoogleSignInRequested extends AuthEvent {}
 
+class FacebookSignInRequested extends AuthEvent {}
+
 class SignOutRequested extends AuthEvent {}
 
 /*abstract class AuthEvent extends Equatable {

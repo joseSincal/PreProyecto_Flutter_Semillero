@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pre_proyecto_universales_chat/Models/user_model.dart';
 
@@ -13,11 +14,15 @@ class LogOutFailure implements Exception {}
 class AuthRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  final FacebookAuth _facebookAuth;
 
   AuthRepository(
-      {firebase_auth.FirebaseAuth? firebaseAuth, GoogleSignIn? googleSignIn})
+      {firebase_auth.FirebaseAuth? firebaseAuth,
+      GoogleSignIn? googleSignIn,
+      FacebookAuth? facebookAuth})
       : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
+        _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
+        _facebookAuth = facebookAuth ?? FacebookAuth.instance;
 
   var currentUser = User.empty;
 
@@ -70,9 +75,24 @@ class AuthRepository {
     }
   }
 
+  Future<void> logInWithFacebook() async {
+    try {
+      final loginResult = await _facebookAuth.login();
+      final credential = firebase_auth.FacebookAuthProvider.credential(
+          loginResult.accessToken!.token);
+      await _firebaseAuth.signInWithCredential(credential);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
   Future<void> logOut() async {
     try {
-      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
+      await Future.wait([
+        _firebaseAuth.signOut(),
+        _googleSignIn.signOut(),
+        _facebookAuth.logOut()
+      ]);
     } on Exception {
       throw LogOutFailure();
     }

@@ -139,7 +139,11 @@ class _PageLoginState extends State<PageLogin> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 _loginSocialMediaBtn(FontAwesomeIcons.facebookF,
-                                    const Color(0xFF416BC1), () {}),
+                                    const Color(0xFF416BC1), () {
+                                  BlocProvider.of<AuthBloc>(context).add(
+                                    FacebookSignInRequested(),
+                                  );
+                                }),
                                 const SizedBox(width: 16),
                                 _loginSocialMediaBtn(FontAwesomeIcons.google,
                                     const Color(0xFFCF4333), () {
