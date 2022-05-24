@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Localization/localization.dart';
@@ -5,7 +6,6 @@ import 'package:pre_proyecto_universales_chat/Pages/page_dashboard/page_dashboar
 import 'package:pre_proyecto_universales_chat/Pages/page_profile/page_profile.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_settings/page_settings.dart';
 import 'package:pre_proyecto_universales_chat/Providers/languaje_provider.dart';
-import 'package:pre_proyecto_universales_chat/Providers/theme_provider.dart';
 import 'package:pre_proyecto_universales_chat/Utils/app_colors.dart';
 import 'package:pre_proyecto_universales_chat/Utils/app_strings.dart';
 import 'package:provider/provider.dart';
@@ -32,21 +32,30 @@ class NavigationDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser!;
+
     return Container(
       padding: EdgeInsets.only(
           top: 34 + MediaQuery.of(context).padding.top, bottom: 24),
       child: Column(children: [
-        const CircleAvatar(
+        CircleAvatar(
             radius: 52,
-            backgroundImage: NetworkImage(
-                'https://i0.wp.com/www.gt-rastreosatelital.com.mx/wordpress/wp-content/uploads/2021/12/Jorge-Sandoval.jpg')),
+            backgroundColor: Colors.transparent,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: user.photoURL != null
+                  ? Image.network(user.photoURL!)
+                  : Theme.of(context).brightness == Brightness.light
+                      ? Image.asset('assets/usuario_light.png')
+                      : Image.asset('assets/usuario_dark.png'),
+            )),
         const SizedBox(height: 12),
         Text(
-          'Username',
+          user.displayName != '' ? user.displayName! : '-',
           style: TextStyle(fontSize: 28, color: cyprus2),
         ),
         Text(
-          'example@company.com',
+          user.email!,
           style: TextStyle(fontSize: 16, color: cyprus2),
         )
       ]),

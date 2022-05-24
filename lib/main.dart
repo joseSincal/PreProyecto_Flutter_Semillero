@@ -1,14 +1,19 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Localization/localization.dart';
+import 'package:pre_proyecto_universales_chat/Pages/page_dashboard/page_dashboard.dart';
+import 'package:pre_proyecto_universales_chat/Pages/page_login/page_login.dart';
 import 'package:pre_proyecto_universales_chat/Providers/languaje_provider.dart';
 import 'package:pre_proyecto_universales_chat/Providers/theme_provider.dart';
-import 'package:pre_proyecto_universales_chat/Widgets/app.dart';
+import 'package:pre_proyecto_universales_chat/Repository/auth_repository.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -73,24 +78,41 @@ class _MyAppState extends State<MyApp> {
               ],
               child: Consumer2(builder: (context, ThemeProvider themeProvider,
                   LanguajeProvider languajeProvider, widget) {
-                return MaterialApp(
-                  locale: languajeProvider.getLang,
-                  localizationsDelegates: const [
-                    AppLocalizationsDelegate(),
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate,
-                  ],
-                  supportedLocales: const [
-                    Locale('es', ''),
-                    Locale('en', ''),
-                  ],
-                  theme: ThemeData.light(),
-                  darkTheme: ThemeData.dark(),
-                  themeMode: themeProvider.getTheme,
-                  debugShowCheckedModeBanner: false,
-                  title: 'SemiFlutter',
-                  home: const App(),
+                return RepositoryProvider(
+                  create: (context) => AuthRepository(),
+                  child: BlocProvider(
+                      create: (context) => AuthBloc(
+                            authRepository:
+                                RepositoryProvider.of<AuthRepository>(context),
+                          ),
+                      child: MaterialApp(
+                        locale: languajeProvider.getLang,
+                        localizationsDelegates: const [
+                          AppLocalizationsDelegate(),
+                          GlobalMaterialLocalizations.delegate,
+                          GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate,
+                        ],
+                        supportedLocales: const [
+                          Locale('es', ''),
+                          Locale('en', ''),
+                        ],
+                        theme: ThemeData.light(),
+                        darkTheme: ThemeData.dark(),
+                        themeMode: themeProvider.getTheme,
+                        debugShowCheckedModeBanner: false,
+                        title: 'SemiFlutter',
+                        home: StreamBuilder<User?>(
+                            stream: FirebaseAuth.instance.authStateChanges(),
+                            builder: (context, snapshot) {
+                              // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
+                              if (snapshot.hasData) {
+                                return const PageDashboard();
+                              }
+                              // Otherwise, they're not signed in. Show the sign in page.
+                              return const PageLogin();
+                            }),
+                      )),
                 );
               }),
             );

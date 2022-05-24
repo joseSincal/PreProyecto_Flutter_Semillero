@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Localization/localization.dart';
+import 'package:pre_proyecto_universales_chat/Pages/page_dashboard/page_dashboard.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_login/widgets/top_header_login.dart';
+import 'package:pre_proyecto_universales_chat/Pages/page_signup/page_signup.dart';
 import 'package:pre_proyecto_universales_chat/Providers/languaje_provider.dart';
 import 'package:pre_proyecto_universales_chat/Utils/app_colors.dart';
 import 'package:pre_proyecto_universales_chat/Utils/app_strings.dart';
@@ -31,7 +33,14 @@ class _PageLoginState extends State<PageLogin> {
         body: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is Authenticated) {
-            } else if (state is AuthError) {}
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PageDashboard()));
+            } else if (state is AuthError) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.error)));
+            }
           },
           child: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
@@ -68,16 +77,16 @@ class _PageLoginState extends State<PageLogin> {
                             LabelText(
                                 label: localization
                                     .dictionary(Strings.loginEmailLabel)),
-                            InputText(
+                            /*InputText(
                               hintText: 'example@email.com',
                               icon: Icons.email_rounded,
-                            ),
+                            ),*/
                             const SizedBox(height: 16),
                             LabelText(
                                 label: localization
                                     .dictionary(Strings.loginPasswordLabel)),
-                            InputPassword(
-                                hintText: '********', icon: Icons.key_rounded),
+                            /*InputPassword(
+                                hintText: '********', icon: Icons.key_rounded),*/
                             const SizedBox(height: 32),
                             Align(
                               alignment: Alignment.center,
@@ -104,7 +113,8 @@ class _PageLoginState extends State<PageLogin> {
                                     ),
                                   ),
                                   child: Text(
-                                    'Login',
+                                    localization
+                                        .dictionary(Strings.loginButton),
                                     style: TextStyle(
                                         fontFamily: 'Quicksand',
                                         fontWeight: FontWeight.w600,
@@ -153,11 +163,21 @@ class _PageLoginState extends State<PageLogin> {
                                 }),
                                 const SizedBox(width: 16),
                                 _loginSocialMediaBtn(FontAwesomeIcons.twitter,
-                                    const Color(0xFF08A0E9), () {}),
+                                    const Color(0xFF08A0E9), () {
+                                  BlocProvider.of<AuthBloc>(context).add(
+                                    TwitterSignInRequested(),
+                                  );
+                                }),
                               ],
                             ),
                             const SizedBox(height: 32),
-                            _createAccountLink(context, localization, () {})
+                            _createAccountLink(context, localization, () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const PageSignUp()),
+                              );
+                            })
                           ],
                         ),
                       ),

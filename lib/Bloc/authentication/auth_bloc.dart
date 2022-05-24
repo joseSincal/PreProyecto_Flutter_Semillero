@@ -54,6 +54,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
+    on<TwitterSignInRequested>((event, emit) async {
+      emit(Loading());
+      try {
+        await authRepository.logInWithTwitter();
+        emit(Authenticated());
+      } catch (e) {
+        emit(AuthError(e.toString()));
+        emit(UnAuthenticated());
+      }
+    });
+
     on<SignOutRequested>((event, emit) async {
       emit(Loading());
       await authRepository.logOut();

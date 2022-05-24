@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pre_proyecto_universales_chat/Models/user_model.dart';
+import 'package:twitter_login/twitter_login.dart';
 
 class SignUpFailure implements Exception {}
 
@@ -15,14 +16,23 @@ class AuthRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final FacebookAuth _facebookAuth;
+  final TwitterLogin _twitterLogin;
 
   AuthRepository(
       {firebase_auth.FirebaseAuth? firebaseAuth,
       GoogleSignIn? googleSignIn,
-      FacebookAuth? facebookAuth})
+      FacebookAuth? facebookAuth,
+      TwitterLogin? twitterLogin})
       : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
-        _facebookAuth = facebookAuth ?? FacebookAuth.instance;
+        _facebookAuth = facebookAuth ?? FacebookAuth.instance,
+        _twitterLogin = twitterLogin ??
+            TwitterLogin(
+                apiKey: 'H31JlrCMKPuRIHXJCAdcLu0Ts',
+                apiSecretKey:
+                    'rVVC37WNZ90XvihipgJDcCwE0O7BjxwxcVfPZyCePtlUIb71jM',
+                redirectURI:
+                    'https://preproyecto-chat-univers-7c68e.firebaseapp.com/__/auth/handler://');
 
   var currentUser = User.empty;
 
@@ -86,12 +96,27 @@ class AuthRepository {
     }
   }
 
+  Future<void> logInWithTwitter() async {
+    try {
+      final authResult = await _twitterLogin.login();
+
+      final credential = firebase_auth.TwitterAuthProvider.credential(
+        accessToken: authResult.authToken!,
+        secret: authResult.authTokenSecret!,
+      );
+      await _firebaseAuth.signInWithCredential(credential);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
   Future<void> logOut() async {
     try {
       await Future.wait([
         _firebaseAuth.signOut(),
         _googleSignIn.signOut(),
-        _facebookAuth.logOut()
+        _facebookAuth.logOut(),
+        //_firebaseAuth.authStateChanges().isEmpty
       ]);
     } on Exception {
       throw LogOutFailure();

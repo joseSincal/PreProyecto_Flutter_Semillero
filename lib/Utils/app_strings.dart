@@ -2,11 +2,19 @@ enum Strings {
   loginWelcome,
   loginEmailLabel,
   loginPasswordLabel,
+  loginButton,
   loginOr,
   loginDontAccount,
   loginCreateAccount,
+  registerText,
+  signupButton,
+  loginHaveAccount,
+  loginWithAccount,
+  emailValidator,
+  passwordValidator,
   navHome,
   navProfile,
   navSetting,
-  logOut
+  logOut,
+  fieldNotEmpty
 }
