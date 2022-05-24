@@ -1,4 +1,5 @@
 import 'package:awesome_icons/awesome_icons.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
@@ -22,6 +23,17 @@ class PageLogin extends StatefulWidget {
 }
 
 class _PageLoginState extends State<PageLogin> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguajeProvider>(context);
@@ -74,59 +86,102 @@ class _PageLoginState extends State<PageLogin> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 40),
-                            LabelText(
-                                label: localization
-                                    .dictionary(Strings.loginEmailLabel)),
-                            /*InputText(
-                              hintText: 'example@email.com',
-                              icon: Icons.email_rounded,
-                            ),*/
-                            const SizedBox(height: 16),
-                            LabelText(
-                                label: localization
-                                    .dictionary(Strings.loginPasswordLabel)),
-                            /*InputPassword(
-                                hintText: '********', icon: Icons.key_rounded),*/
-                            const SizedBox(height: 32),
-                            Align(
-                              alignment: Alignment.center,
-                              child: SizedBox(
-                                height: 46,
-                                width: 160,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Para logearse :)
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Theme.of(context).brightness ==
-                                                    Brightness.light
-                                                ? salem
-                                                : cultured),
-                                    shape: MaterialStateProperty.all<
-                                        OutlinedBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30.0),
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    localization
-                                        .dictionary(Strings.loginButton),
-                                    style: TextStyle(
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? cultured
-                                            : cyprus),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Form(
+                                key: _formKey,
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      AutofillGroup(
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          LabelText(
+                                              label: localization.dictionary(
+                                                  Strings.loginEmailLabel)),
+                                          InputText(
+                                            hintText: 'example@email.com',
+                                            icon: Icons.email_rounded,
+                                            validator:
+                                                _emailValidator(localization),
+                                            autofillHints: const [
+                                              AutofillHints.email
+                                            ],
+                                            controller: _emailController,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          LabelText(
+                                              label: localization.dictionary(
+                                                  Strings.loginPasswordLabel)),
+                                          InputPassword(
+                                            hintText: '********',
+                                            icon: Icons.key_rounded,
+                                            validator: _passwordValidator(
+                                                localization),
+                                            autofillHints: const [
+                                              AutofillHints.password
+                                            ],
+                                            controller: _passwordController,
+                                          )
+                                        ],
+                                      )),
+                                      const SizedBox(height: 32),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: SizedBox(
+                                          height: 46,
+                                          width: 160,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                BlocProvider.of<AuthBloc>(
+                                                        context)
+                                                    .add(
+                                                  SignInRequested(
+                                                      _emailController.text,
+                                                      _passwordController.text),
+                                                );
+                                              }
+                                            },
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.light
+                                                      ? salem
+                                                      : cultured),
+                                              shape: MaterialStateProperty.all<
+                                                  OutlinedBorder>(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          30.0),
+                                                ),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              localization.dictionary(
+                                                  Strings.loginButton),
+                                              style: TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 18,
+                                                  color: Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.light
+                                                      ? cultured
+                                                      : cyprus),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ])),
                             const SizedBox(height: 12),
                             Align(
                               alignment: Alignment.center,
@@ -254,5 +309,27 @@ class _PageLoginState extends State<PageLogin> {
         ),
       ),
     );
+  }
+
+  String? Function(String?) _emailValidator(AppLocalizations localization) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return localization.dictionary(Strings.fieldNotEmpty);
+      }
+      return !EmailValidator.validate(value)
+          ? localization.dictionary(Strings.emailValidator)
+          : null;
+    };
+  }
+
+  String? Function(String?) _passwordValidator(AppLocalizations localization) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return localization.dictionary(Strings.fieldNotEmpty);
+      }
+      return value.length < 6
+          ? localization.dictionary(Strings.passwordValidator)
+          : null;
+    };
   }
 }
