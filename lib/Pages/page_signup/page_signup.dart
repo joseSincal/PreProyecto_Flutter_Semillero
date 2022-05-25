@@ -25,11 +25,13 @@ class _PageSignUpState extends State<PageSignUp> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -46,8 +48,7 @@ class _PageSignUpState extends State<PageSignUp> {
           if (state is Authenticated) {
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => const PageDashboard()));
-          }
-          else if (state is AuthError) {
+          } else if (state is AuthError) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
           }
@@ -104,6 +105,16 @@ class _PageSignUpState extends State<PageSignUp> {
                               controller: _passwordController,
                               validator: _passwordValidator(localization),
                             ),
+                            const SizedBox(height: 16),
+                            LabelText(
+                                label:
+                                    '${localization.dictionary(Strings.usernameLabel)} *'),
+                            InputText(
+                              hintText: 'username',
+                              icon: Icons.person_rounded,
+                              controller: _usernameController,
+                              validator: _usernameValidator(localization),
+                            ),
                             const SizedBox(height: 32),
                             Align(
                               alignment: Alignment.center,
@@ -115,9 +126,9 @@ class _PageSignUpState extends State<PageSignUp> {
                                     if (_formKey.currentState!.validate()) {
                                       BlocProvider.of<AuthBloc>(context).add(
                                         SignUpRequested(
-                                          _emailController.text,
-                                          _passwordController.text,
-                                        ),
+                                            _emailController.text,
+                                            _passwordController.text,
+                                            _usernameController.text),
                                       );
                                     }
                                   },
@@ -151,7 +162,7 @@ class _PageSignUpState extends State<PageSignUp> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 16),
                             _logInAccountLink(context, localization, () {
                               Navigator.pushReplacement(
                                 context,
@@ -229,6 +240,15 @@ class _PageSignUpState extends State<PageSignUp> {
       return value.length < 6
           ? localization.dictionary(Strings.passwordValidator)
           : null;
+    };
+  }
+
+  String? Function(String?) _usernameValidator(AppLocalizations localization) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return localization.dictionary(Strings.fieldNotEmpty);
+      }
+      return null;
     };
   }
 }

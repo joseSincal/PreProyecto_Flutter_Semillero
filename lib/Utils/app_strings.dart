@@ -12,6 +12,7 @@ enum Strings {
   loginWithAccount,
   emailValidator,
   passwordValidator,
+  usernameLabel,
   navHome,
   navProfile,
   navSetting,

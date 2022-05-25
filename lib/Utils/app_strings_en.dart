@@ -14,6 +14,7 @@ const Map<Strings, String> dictionary_en = {
   Strings.loginWithAccount: 'Sign In',
   Strings.emailValidator: 'Enter a valid email',
   Strings.passwordValidator: 'Enter min. 6 characters',
+  Strings.usernameLabel: 'Username',
   Strings.navHome: 'Home',
   Strings.navProfile: 'View profile',
   Strings.navSetting: 'Settings',

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
 import 'package:pre_proyecto_universales_chat/Localization/localization.dart';
+import 'package:pre_proyecto_universales_chat/Models/user_model.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_dashboard/page_dashboard.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_profile/page_profile.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_settings/page_settings.dart';
@@ -32,7 +33,7 @@ class NavigationDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser!;
+    UserModel user = UserModel.fromFirebase(FirebaseAuth.instance.currentUser!);
 
     return Container(
       padding: EdgeInsets.only(
@@ -43,19 +44,19 @@ class NavigationDrawer extends StatelessWidget {
             backgroundColor: Colors.transparent,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(50),
-              child: user.photoURL != null
-                  ? Image.network(user.photoURL!)
+              child: user.photo != ''
+                  ? Image.network(user.photo)
                   : Theme.of(context).brightness == Brightness.light
                       ? Image.asset('assets/usuario_light.png')
                       : Image.asset('assets/usuario_dark.png'),
             )),
         const SizedBox(height: 12),
         Text(
-          user.displayName != '' ? user.displayName! : '-',
+          user.name,
           style: TextStyle(fontSize: 28, color: cyprus2),
         ),
         Text(
-          user.email!,
+          user.email,
           style: TextStyle(fontSize: 16, color: cyprus2),
         )
       ]),

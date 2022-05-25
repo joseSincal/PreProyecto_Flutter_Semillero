@@ -1,22 +1,15 @@
-import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
-class User extends Equatable {
-  final String id;
-  final String? email;
-  final String? name;
-  final String? photo;
+class UserModel {
+  late String id;
+  late String email;
+  late String name;
+  late String photo;
 
-  const User(
-      {required this.id,
-      this.email,
-       this.name,
-       this.photo});
-
-  static const empty = User(id: '');
-
-  bool get isEmpty => this == User.empty;
-  bool get isNotEmpty => this != User.empty;
-
-  @override
-  List<Object?> get props => [id, email, name, photo];
+  UserModel.fromFirebase(firebase_auth.User user) {
+    id = user.uid;
+    email = user.email ?? '-';
+    name = user.displayName ?? '-';
+    photo = user.photoURL ?? '';
+  }
 }

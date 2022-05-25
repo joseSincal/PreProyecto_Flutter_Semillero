@@ -2,18 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pre_proyecto_universales_chat/Models/user_model.dart';
+import 'package:pre_proyecto_universales_chat/Repository/db_repository.dart';
 import 'package:twitter_login/twitter_login.dart';
-
-class SignUpFailure implements Exception {}
-
-class LogInWithEmailAndPasswordFailure implements Exception {}
-
-class LogInWithGoogleFailure implements Exception {}
 
 class LogOutFailure implements Exception {}
 
 class AuthRepository {
-  final firebase_auth.FirebaseAuth _firebaseAuth;
+  firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final FacebookAuth _facebookAuth;
   final TwitterLogin _twitterLogin;
@@ -31,23 +26,23 @@ class AuthRepository {
                 apiKey: 'H31JlrCMKPuRIHXJCAdcLu0Ts',
                 apiSecretKey:
                     'rVVC37WNZ90XvihipgJDcCwE0O7BjxwxcVfPZyCePtlUIb71jM',
-                redirectURI:
-                    'https://preproyecto-chat-univers-7c68e.firebaseapp.com/__/auth/handler://');
+                redirectURI: 'flutter-twitter-login://');
 
-  var currentUser = User.empty;
-
-  Stream<User> get user {
+  Stream<UserModel?> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
-      currentUser = user;
-      return user;
+      return firebaseUser == null ? null : UserModel.fromFirebase(firebaseUser);
     });
   }
 
-  Future<void> signUp({required String email, required String password}) async {
+  Future<void> signUp(
+      {required String email,
+      required String password,
+      required String username}) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
+      await credential.user!.updateDisplayName(username);
+      await _registerUser();
     } on firebase_auth.FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         throw Exception('The password provided is too weak.');
@@ -80,6 +75,7 @@ class AuthRepository {
       final credential = firebase_auth.GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
       await _firebaseAuth.signInWithCredential(credential);
+      await _registerUser();
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -91,6 +87,7 @@ class AuthRepository {
       final credential = firebase_auth.FacebookAuthProvider.credential(
           loginResult.accessToken!.token);
       await _firebaseAuth.signInWithCredential(credential);
+      await _registerUser();
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -105,6 +102,7 @@ class AuthRepository {
         secret: authResult.authTokenSecret!,
       );
       await _firebaseAuth.signInWithCredential(credential);
+      await _registerUser();
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -116,16 +114,16 @@ class AuthRepository {
         _firebaseAuth.signOut(),
         _googleSignIn.signOut(),
         _facebookAuth.logOut(),
-        //_firebaseAuth.authStateChanges().isEmpty
       ]);
+      _firebaseAuth = firebase_auth.FirebaseAuth.instance;
     } on Exception {
       throw LogOutFailure();
     }
   }
-}
 
-extension on firebase_auth.User {
-  User get toUser {
-    return User(id: uid, email: email, name: displayName, photo: photoURL);
+  Future<void> _registerUser() async {
+    UserModel user = UserModel.fromFirebase(_firebaseAuth.currentUser!);
+    await DBRepository.shared.verifyGeneralChanel(user.id);
+    await DBRepository.shared.verifyUser(user);
   }
 }

@@ -78,8 +78,9 @@ class _MyAppState extends State<MyApp> {
               ],
               child: Consumer2(builder: (context, ThemeProvider themeProvider,
                   LanguajeProvider languajeProvider, widget) {
+                FirebaseAuth firebaseAuth = FirebaseAuth.instance;
                 return RepositoryProvider(
-                  create: (context) => AuthRepository(),
+                  create: (context) => AuthRepository(firebaseAuth: firebaseAuth),
                   child: BlocProvider(
                       create: (context) => AuthBloc(
                             authRepository:
@@ -103,7 +104,7 @@ class _MyAppState extends State<MyApp> {
                         debugShowCheckedModeBanner: false,
                         title: 'SemiFlutter',
                         home: StreamBuilder<User?>(
-                            stream: FirebaseAuth.instance.authStateChanges(),
+                            stream: firebaseAuth.authStateChanges(),
                             builder: (context, snapshot) {
                               // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
                               if (snapshot.hasData) {
