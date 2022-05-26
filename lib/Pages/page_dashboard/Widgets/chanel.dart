@@ -1,16 +1,18 @@
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pre_proyecto_universales_chat/Repository/db_repository.dart';
+import 'package:pre_proyecto_universales_chat/Models/msj_model.dart';
+import 'package:pre_proyecto_universales_chat/Pages/page_chat/PageChat.dart';
 import 'package:pre_proyecto_universales_chat/Utils/app_colors.dart';
 
 class Chanel extends StatelessWidget {
+  final String id;
   final String title;
   final String subtitle;
   final String hour;
 
   Chanel(
       {Key? key,
+      required this.id,
       required this.title,
       required this.subtitle,
       required this.hour})
@@ -52,6 +54,10 @@ class Chanel extends StatelessWidget {
               fontWeight: FontWeight.w600)),
       onTap: () {
         //DBRepository.shared.getChanels(FirebaseAuth.instance.currentUser!.uid);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PageChat(chanelId: id, name: title)));
       },
     );
   }

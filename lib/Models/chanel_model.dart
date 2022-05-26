@@ -25,13 +25,14 @@ class ChanelModel {
         MsgModel.fromRealtime(k as String, v as Map<Object?, Object?>, uId)));
     if (listMsj.length > 1) {
       listMsj.sort(
-          (msjA, msjB) => msjA.fechaEnvio.isAfter(msjB.fechaEnvio) ? 1 : 0);
+          (msjA, msjB) => msjA.fechaEnvioEpoch.compareTo(msjB.fechaEnvioEpoch));
     }
     mensajes = listMsj;
 
     List<String> listUser = List<String>.empty(growable: true);
     var userMap = moreData['usuarios'] as Map<Object?, Object?>;
     userMap.forEach((k, v) => listUser.add(v as String));
+
     usuarios = listUser;
 
     isMy = usuarios.contains(uId);

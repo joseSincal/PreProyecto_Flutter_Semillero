@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/rendering.dart';
 
 class UserModel {
   late String id;
@@ -11,5 +12,11 @@ class UserModel {
     email = user.email ?? '-';
     name = user.displayName ?? '-';
     photo = user.photoURL ?? '';
+  }
+
+  UserModel.fromRealtime(this.id, Map<dynamic, dynamic> data) {
+    email = data['correo'];
+    name = data['nombre'];
+    photo = data['urlImage'];
   }
 }

@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:pre_proyecto_universales_chat/Models/chanel_model.dart';
+import 'package:pre_proyecto_universales_chat/Models/msj_model.dart';
 import 'package:pre_proyecto_universales_chat/Models/user_model.dart';
 import 'package:pre_proyecto_universales_chat/Pages/page_dashboard/Widgets/chanel.dart';
-import 'package:twitter_login/entity/user.dart';
+import 'package:uuid/uuid.dart';
 
 class DBRepository {
   DBRepository._privateConstructor();
@@ -12,6 +11,7 @@ class DBRepository {
   static final DBRepository shared = DBRepository._privateConstructor();
 
   final FirebaseDatabase _db = FirebaseDatabase.instance;
+  final _uuid = const Uuid();
 
   Future<void> verifyGeneralChanel(String userUid) async {
     final snapshot = await _db.ref().child('Canales/General').get();
@@ -62,16 +62,15 @@ class DBRepository {
     chanelsMap.forEach((k, v) => chanelsList.add(ChanelModel.fromRealtime(
         k as String, v as Map<Object?, Object?>, userUid)));
 
-    chanelsList.sort((chanelA, chanelB) => chanelA
-            .mensajes[chanelA.mensajes.length - 1].fechaEnvio
-            .isAfter(chanelB.mensajes[chanelB.mensajes.length - 1].fechaEnvio)
-        ? 0
-        : 1);
+    chanelsList.sort((chanelA, chanelB) =>
+        chanelB.mensajes[chanelB.mensajes.length - 1].fechaEnvioEpoch.compareTo(
+            chanelA.mensajes[chanelA.mensajes.length - 1].fechaEnvioEpoch));
 
     for (ChanelModel chanel in chanelsList) {
       if (chanel.isMy) {
         var ultimoMsj = chanel.mensajes[chanel.mensajes.length - 1];
         chanelCards.add(Chanel(
+          id: chanel.id,
           title: chanel.nombre,
           subtitle: ultimoMsj.texto,
           hour: _fechaRecortada(ultimoMsj.fechaEnvio),
@@ -80,6 +79,32 @@ class DBRepository {
     }
 
     return chanelCards;
+  }
+
+  List<MsgModel> getMessages(DatabaseEvent event, String userUid) {
+    var chanelMap = event.snapshot.value as Map<Object?, Object?>;
+
+    ChanelModel chanel = ChanelModel.fromRealtime(
+        event.snapshot.key as String, chanelMap, userUid);
+
+    return chanel.mensajes;
+  }
+
+  Future<void> sendMessage(String msg, String idChannel, String uId) async {
+    DatabaseReference ref =
+        _db.ref("Canales/$idChannel/mensajes/${_uuid.v4()}");
+    await ref.set({
+      'fecha_envio': DateTime.now().millisecondsSinceEpoch,
+      'texto': msg,
+      'type': 'texto',
+      'usuario': uId
+    });
+  }
+
+  Future<UserModel> getUser(String id) async {
+    final snapshot = await _db.ref().child('Usuarios/$id').get();
+    var userMap = snapshot.value as Map<Object?, Object?>;
+    return UserModel.fromRealtime(snapshot.key as String, userMap);
   }
 
   String _fechaRecortada(DateTime fecha) {
