@@ -115,7 +115,6 @@ class AuthRepository {
         _googleSignIn.signOut(),
         _facebookAuth.logOut(),
       ]);
-      _firebaseAuth = firebase_auth.FirebaseAuth.instance;
     } on Exception {
       throw LogOutFailure();
     }

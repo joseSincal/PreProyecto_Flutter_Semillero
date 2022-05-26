@@ -17,5 +17,13 @@ enum Strings {
   navProfile,
   navSetting,
   logOut,
-  fieldNotEmpty
+  fieldNotEmpty,
+  settings,
+  languajeOption,
+  languajeOptionSpanish,
+  languajeOptionEnglish,
+  themeOption,
+  themeOptionLight,
+  themeOptionDark,
+  themeOptionSystem
 }

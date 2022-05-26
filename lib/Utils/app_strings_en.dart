@@ -19,5 +19,13 @@ const Map<Strings, String> dictionary_en = {
   Strings.navProfile: 'View profile',
   Strings.navSetting: 'Settings',
   Strings.logOut: 'Log Out',
-  Strings.fieldNotEmpty: 'This field is required'
+  Strings.fieldNotEmpty: 'This field is required',
+  Strings.settings: 'Settings',
+  Strings.languajeOption: 'Language',
+  Strings.languajeOptionSpanish: 'Spanish',
+  Strings.languajeOptionEnglish: 'English',
+  Strings.themeOption: 'Theme',
+  Strings.themeOptionLight: 'Light',
+  Strings.themeOptionDark: 'Dark',
+  Strings.themeOptionSystem: 'System'
 };

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
@@ -45,7 +46,9 @@ class NavigationDrawer extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(50),
               child: user.photo != ''
-                  ? Image.network(user.photo)
+                  ? CachedNetworkImage(
+                      imageUrl: user.photo,
+                    )
                   : Theme.of(context).brightness == Brightness.light
                       ? Image.asset('assets/usuario_light.png')
                       : Image.asset('assets/usuario_dark.png'),
