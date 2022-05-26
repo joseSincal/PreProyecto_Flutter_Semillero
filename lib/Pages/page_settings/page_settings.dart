@@ -18,8 +18,6 @@ class PageSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserModel user = UserModel.fromFirebase(FirebaseAuth.instance.currentUser!);
-
     final lang = Provider.of<LanguajeProvider>(context);
     AppLocalizations localization = AppLocalizations(lang.getLang);
 

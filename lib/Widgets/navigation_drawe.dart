@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pre_proyecto_universales_chat/Bloc/authentication/auth_bloc.dart';
@@ -49,9 +50,15 @@ class NavigationDrawer extends StatelessWidget {
                   ? CachedNetworkImage(
                       imageUrl: user.photo,
                     )
-                  : Theme.of(context).brightness == Brightness.light
-                      ? Image.asset('assets/usuario_light.png')
-                      : Image.asset('assets/usuario_dark.png'),
+                  : TextAvatar(
+                      text: user.name == '-' ? user.email : user.name,
+                      size: 75,
+                      numberLetters: 2,
+                      textColor: cultured,
+                      fontFamily: 'Quicksand',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 50,
+                    ),
             )),
         const SizedBox(height: 12),
         Text(
