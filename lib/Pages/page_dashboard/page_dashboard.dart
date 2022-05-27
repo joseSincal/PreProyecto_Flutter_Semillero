@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pre_proyecto_universales_chat/Pages/Page_create_channel/page_create_channel.dart';
 import 'package:pre_proyecto_universales_chat/Repository/db_repository.dart';
 import 'package:pre_proyecto_universales_chat/Utils/app_colors.dart';
 import 'package:pre_proyecto_universales_chat/Widgets/navigation_drawe.dart';
@@ -43,7 +44,12 @@ class PageDashboard extends StatelessWidget {
           backgroundColor:
               Theme.of(context).brightness == Brightness.light ? eden : cyprus,
           child: const Icon(CupertinoIcons.bubble_left_bubble_right_fill),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const PageCreateChannel()));
+          },
         ));
   }
 }

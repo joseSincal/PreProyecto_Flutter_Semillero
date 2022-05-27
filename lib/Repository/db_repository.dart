@@ -90,6 +90,10 @@ class DBRepository {
     return chanel.mensajes;
   }
 
+  /*Future<List<UserModel>> getUsers() async {
+
+  }*/
+
   Future<void> sendMessage(String msg, String idChannel, String uId) async {
     DatabaseReference ref =
         _db.ref("Canales/$idChannel/mensajes/${_uuid.v4()}");
